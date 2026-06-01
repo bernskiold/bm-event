@@ -3,7 +3,7 @@
   "description": "Functionality to help you market and manage an event. From showing speakers to a live agenda for one or multiple days.",
   "type": "wordpress-plugin",
   "require": {
-    "bernskioldmedia/wp-plugin-base": "~1.0",
+    "bernskioldmedia/wp-plugin-base": "~2.4",
     "bernskioldmedia/block-plugin-support": "^1.0",
     "composer/installers": "~1.0",
     "php": ">=7.4|^8.0"
