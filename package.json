@@ -52,7 +52,7 @@
     "prettier": "^2.8.8",
     "sass": "^1.100.0",
     "sass-loader": "^8.0",
-    "stylelint": "^9.10",
+    "stylelint": "^15.10",
     "stylelint-config-wordpress": "^14.0",
     "stylelint-declaration-use-variable": "^1.7",
     "stylelint-order": "^2.2",
