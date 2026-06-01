@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fb827fc9ae25f2b6c74b45b163faea1",
+    "content-hash": "6b04f05153a9c8356cd788e72b616f34",
     "packages": [
         {
             "name": "bernskioldmedia/block-plugin-support",
-            "version": "1.4.4",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/bernskioldmedia/Block-Plugin-Support.git",
-                "reference": "a0f6f6136abd6973e4741cb35e5bf3ba4f39573a"
+                "url": "https://github.com/bernskiold/Block-Plugin-Support.git",
+                "reference": "2dfa1051bd795932d46207db915689d219cc4515"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bernskioldmedia/Block-Plugin-Support/zipball/a0f6f6136abd6973e4741cb35e5bf3ba4f39573a",
-                "reference": "a0f6f6136abd6973e4741cb35e5bf3ba4f39573a",
+                "url": "https://api.github.com/repos/bernskiold/Block-Plugin-Support/zipball/2dfa1051bd795932d46207db915689d219cc4515",
+                "reference": "2dfa1051bd795932d46207db915689d219cc4515",
                 "shasum": ""
             },
             "require": {
@@ -45,10 +45,9 @@
             ],
             "description": "A reusable way of adding block support to a WordPress plugin.",
             "support": {
-                "issues": "https://github.com/bernskioldmedia/Block-Plugin-Support/issues",
-                "source": "https://github.com/bernskioldmedia/Block-Plugin-Support/tree/1.4.4"
+                "source": "https://github.com/bernskiold/Block-Plugin-Support/tree/2.1.1"
             },
-            "time": "2021-07-17T15:40:41+00:00"
+            "time": "2022-05-03T09:51:04+00:00"
         },
         {
             "name": "bernskioldmedia/wp-plugin-base",
@@ -389,12 +388,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4|^8.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
