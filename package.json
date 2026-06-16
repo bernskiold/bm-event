@@ -50,7 +50,7 @@
     "postcss-custom-properties": "^9.2.0",
     "postcss-preset-env": "^6.7",
     "prettier": "^2.8.8",
-    "sass": "^1.100.0",
+    "sass": "^1.101.0",
     "sass-loader": "^8.0",
     "stylelint": "^9.10",
     "stylelint-config-wordpress": "^14.0",
