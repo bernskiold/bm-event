@@ -38,5 +38,5 @@ jobs:
             # The class files are lowercase in this plugin.
             version-files: |
                 src/plugin.php
-            satis: true
+            satis: false
         secrets: inherit
