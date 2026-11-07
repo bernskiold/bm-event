@@ -178,7 +178,9 @@ class Plugin {
 			extract( $variables ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 		}
 
-		$located = locate_template( 'components/' . $template_name );
+		// Themes can override a template in components/<template>.php. The
+		// extension used to be left out, so the override was never found.
+		$located = locate_template( [ 'components/' . $template_name . '.php', 'components/' . $template_name ] );
 
 		if ( $located ) {
 			include $located;

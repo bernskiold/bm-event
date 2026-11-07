@@ -39,6 +39,10 @@ class SessionHelper
 	}
 
 	public static function the_player( int $session_id ): void {
+		if ( ! self::get_embed_url( $session_id ) ) {
+			return;
+		}
+
 		echo wp_oembed_get( self::get_embed_url( $session_id ), [
 			'width'  => 1280,
 			'height' => 720,

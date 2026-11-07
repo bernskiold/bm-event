@@ -21,9 +21,17 @@
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "wp-coding-standards/wpcs": "^3.4"
+    "phpunit/phpunit": "^9.6",
+    "wp-coding-standards/wpcs": "^3.4",
+    "yoast/phpunit-polyfills": "^4.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BernskioldMedia\\WP\\Event\\Tests\\": "tests/php/"
+    }
   },
   "scripts": {
+    "test": "phpunit",
     "lint": "phpcs",
     "lint:fix": "phpcbf"
   },
