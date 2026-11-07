@@ -17,6 +17,7 @@
 namespace BernskioldMedia\WP\Event\Abstracts;
 
 use BernskioldMedia\WP\Event\Exceptions\Data_Store_Exception;
+use BernskioldMedia\WP\Event\Log;
 
 defined( 'ABSPATH' ) || exit;
 

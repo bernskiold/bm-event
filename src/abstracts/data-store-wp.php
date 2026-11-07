@@ -2,6 +2,7 @@
 
 namespace BernskioldMedia\WP\Event\Abstracts;
 
+use BernskioldMedia\WP\Event\Hookable;
 use BernskioldMedia\WP\Event\Interfaces\Data_Store_Interface;
 
 defined( 'ABSPATH' ) || exit;
@@ -11,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @package BernskioldMedia\WP\Event\Abstracts
  */
-abstract class Data_Store_WP implements Data_Store_Interface {
+abstract class Data_Store_WP implements Data_Store_Interface, Hookable {
 
 	/**
 	 * Object Type Key
@@ -58,9 +59,9 @@ abstract class Data_Store_WP implements Data_Store_Interface {
 	protected static $data_class;
 
 	/**
-	 * Custom_Post_Type constructor.
+	 * Register the hooks for the data store.
 	 */
-	public function __construct() {
+	public static function hooks(): void {
 		add_action( 'init', [ static::class, 'register' ], 10 );
 		add_action( 'bm_event_install', [ static::class, 'register' ] );
 

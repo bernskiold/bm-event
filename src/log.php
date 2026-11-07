@@ -2,20 +2,18 @@
 /**
  * Logger
  *
- * Adds a logger based on Monolog easily accessible as static functions
- * in the plugin.
+ * A small logger exposed as static functions in the plugin. Messages
+ * are written with error_log(), so they end up wherever PHP and
+ * WordPress (WP_DEBUG_LOG) send errors on the site.
  *
- * See link below for an overview of the log levels.
- *
- * @link    https://github.com/Seldaek/monolog/blob/HEAD/doc/01-usage.md#log-levels
+ * By default only errors and above are logged. Define ENABLE_LOGGING
+ * as true to log everything, or LOGGING_LEVEL as one of the level
+ * names below (e.g. 'warning') to choose the threshold.
  *
  * @package BernskioldMedia\WP\Event
  */
 
 namespace BernskioldMedia\WP\Event;
-
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,50 +25,59 @@ defined( 'ABSPATH' ) || exit;
 class Log {
 
 	/**
-	 * Class Instance
-	 *
-	 * @var $instance
+	 * Log levels and their severity, following RFC 5424.
 	 */
-	protected static $instance;
+	public const LEVELS = [
+		'debug'     => 100,
+		'info'      => 200,
+		'notice'    => 250,
+		'warning'   => 300,
+		'error'     => 400,
+		'critical'  => 500,
+		'alert'     => 550,
+		'emergency' => 600,
+	];
 
 	/**
-	 * Method to return the Monolog instance
-	 *
-	 * @return \Monolog\Logger
+	 * Get the minimum level that is written to the log.
 	 */
-	public static function get() {
-		if ( ! self::$instance ) {
-			self::configure();
+	public static function get_threshold(): int {
+		if ( defined( 'LOGGING_LEVEL' ) ) {
+			$level = LOGGING_LEVEL;
+
+			if ( is_numeric( $level ) ) {
+				return (int) $level;
+			}
+
+			return self::LEVELS[ strtolower( (string) $level ) ] ?? self::LEVELS['error'];
 		}
 
-		return self::$instance;
+		if ( defined( 'ENABLE_LOGGING' ) && true === ENABLE_LOGGING ) {
+			return self::LEVELS['debug'];
+		}
+
+		return self::LEVELS['error'];
 	}
 
 	/**
-	 * Configure Monolog to use a rotating files system.
+	 * Write a message to the log if it meets the threshold.
+	 *
+	 * @param  string $level    Level name.
+	 * @param  string $message  Message.
+	 * @param  array  $context  Data.
 	 */
-	protected static function configure() {
-
-		// Set the log path outside of WordPress public!
-		$log_path = ABSPATH . '../logs/' . Plugin::TEXTDOMAIN . '.log';
-
-		// Create the logger.
-		$logger = new Logger( Plugin::TEXTDOMAIN );
-
-		// Define the log level depending on environment.
-
-		if ( defined( 'LOGGING_LEVEL' ) ) {
-			$log_level = LOGGING_LEVEL;
-		} elseif ( defined( 'ENABLE_LOGGING' ) && true === ENABLE_LOGGING ) {
-			$log_level = Logger::DEBUG;
-		} else {
-			$log_level = Logger::ERROR;
+	public static function log( string $level, $message, array $context = [] ): void {
+		if ( ( self::LEVELS[ $level ] ?? 0 ) < self::get_threshold() ) {
+			return;
 		}
 
-		// Set up the local saving.
-		$logger->pushHandler( new StreamHandler( $log_path, $log_level ) );
+		$line = sprintf( '[%s] %s: %s', Plugin::TEXTDOMAIN, strtoupper( $level ), $message );
 
-		self::$instance = $logger;
+		if ( $context ) {
+			$line .= ' ' . wp_json_encode( $context );
+		}
+
+		error_log( $line ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 	}
 
 	/**
@@ -79,8 +86,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function debug( $message, array $context = [] ) {
-		self::get()->addDebug( $message, $context );
+	public static function debug( $message, array $context = [] ): void {
+		self::log( 'debug', $message, $context );
 	}
 
 	/**
@@ -89,8 +96,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function info( $message, array $context = [] ) {
-		self::get()->addInfo( $message, $context );
+	public static function info( $message, array $context = [] ): void {
+		self::log( 'info', $message, $context );
 	}
 
 	/**
@@ -99,8 +106,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function notice( $message, array $context = [] ) {
-		self::get()->addNotice( $message, $context );
+	public static function notice( $message, array $context = [] ): void {
+		self::log( 'notice', $message, $context );
 	}
 
 	/**
@@ -109,8 +116,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function warning( $message, array $context = [] ) {
-		self::get()->addWarning( $message, $context );
+	public static function warning( $message, array $context = [] ): void {
+		self::log( 'warning', $message, $context );
 	}
 
 	/**
@@ -119,8 +126,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function error( $message, array $context = [] ) {
-		self::get()->addError( $message, $context );
+	public static function error( $message, array $context = [] ): void {
+		self::log( 'error', $message, $context );
 	}
 
 	/**
@@ -129,8 +136,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function critical( $message, array $context = [] ) {
-		self::get()->addCritical( $message, $context );
+	public static function critical( $message, array $context = [] ): void {
+		self::log( 'critical', $message, $context );
 	}
 
 	/**
@@ -139,8 +146,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function alert( $message, array $context = [] ) {
-		self::get()->addAlert( $message, $context );
+	public static function alert( $message, array $context = [] ): void {
+		self::log( 'alert', $message, $context );
 	}
 
 	/**
@@ -149,8 +156,8 @@ class Log {
 	 * @param  string $message  Message.
 	 * @param  array  $context  Data.
 	 */
-	public static function emergency( $message, array $context = [] ) {
-		self::get()->addEmergency( $message, $context );
+	public static function emergency( $message, array $context = [] ): void {
+		self::log( 'emergency', $message, $context );
 	}
 
 }

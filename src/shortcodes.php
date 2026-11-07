@@ -7,7 +7,7 @@ namespace BernskioldMedia\WP\Event;
  *
  * @package BernskioldMedia\WP\Event
  */
-class Shortcodes
+class Shortcodes implements Hookable
 {
 	public static function hooks(): void
 	{

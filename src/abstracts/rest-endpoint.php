@@ -54,23 +54,20 @@ abstract class REST_Endpoint extends \WP_REST_Controller implements REST_Endpoin
 
 	/**
 	 * Version
-	 *
-	 * @var string
 	 */
-	protected $version = '1';
+	protected string $version = '1';
 
 	/**
 	 * REST Routes
-	 *
-	 * @var array
 	 */
-	protected $routes = [];
+	protected array $routes = [];
 
 	/**
-	 * Setup Extension
+	 * Set up the routes and hook them in.
 	 */
-	public function __construct() {
+	public function load(): void {
 		$this->setup_routes();
+		$this->init();
 	}
 
 	/**
@@ -98,13 +95,8 @@ abstract class REST_Endpoint extends \WP_REST_Controller implements REST_Endpoin
 
 	/**
 	 * Get sanitized URL param filter value.
-	 *
-	 * @param  \WP_REST_Request $request
-	 * @param  string           $key
-	 *
-	 * @return string|null
 	 */
-	protected function get_filter_value( \WP_REST_Request $request, string $key ) {
+	protected function get_filter_value( \WP_REST_Request $request, string $key ): ?string {
 		return isset( $request[ $key ] ) ? wp_strip_all_tags( $request[ $key ] ) : null;
 	}
 
@@ -113,9 +105,13 @@ abstract class REST_Endpoint extends \WP_REST_Controller implements REST_Endpoin
 	 *
 	 * @param  string $route  NB. Prefix with /
 	 * @param  array  $args
+	 *
+	 * @return static
 	 */
-	protected function add_route( string $route, array $args ): array {
+	protected function add_route( string $route, array $args ) {
 		$this->routes[ $route ] = $args;
+
+		return $this;
 	}
 
 	/**

@@ -1,16 +1,18 @@
 <?php
+/**
+ * Main plugin class.
+ *
+ * @package BernskioldMedia\WP\Event
+ */
 
 namespace BernskioldMedia\WP\Event;
 
-use BernskioldMedia\WP\Block_Plugin_Support\Traits\Has_Blocks;
 use BernskioldMedia\WP\Event\Blocks\Track_Timetable\Track_Timetable_Block;
 use BernskioldMedia\WP\Event\Data_Stores\Session;
 use BernskioldMedia\WP\Event\Data_Stores\Speaker;
 use BernskioldMedia\WP\Event\Data_Stores\Track;
 use BernskioldMedia\WP\Event\Rest\NextVideo;
 use BernskioldMedia\WP\Event\Rest\SessionGrid;
-use BernskioldMedia\WP\PluginBase\Abstracts\Base_Plugin;
-use BernskioldMedia\WP\PluginBase\Traits\Has_Data_Stores;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -19,49 +21,29 @@ defined( 'ABSPATH' ) || exit;
  *
  * @package BernskioldMedia\WP\Event
  */
-class Plugin extends Base_Plugin {
+class Plugin {
 
-	use Has_Blocks, Has_Data_Stores;
+	public const TEXTDOMAIN = 'bm-event';
+
+	/**
+	 * Prefix used for the block names and script handles.
+	 */
+	public const BLOCK_PREFIX = 'bm';
 
 	/**
 	 * Version
+	 *
+	 * Kept as a property in this exact form because the release
+	 * workflow bumps `version = '...'` in this file.
 	 *
 	 * @var string
 	 */
 	protected static $version = '1.2.4';
 
 	/**
-	 * Database Version
-	 *
-	 * @var string
-	 */
-	protected static $database_version = '1000';
-
-	/**
-	 * Plugin Textdomain
-	 *
-	 * @var string
-	 */
-	protected static $textdomain = 'bm-event';
-
-	/**
-	 * Main plugin file path.
-	 *
-	 * @var string
-	 */
-	protected static $plugin_file_path = BM_EVENT_FILE_PATH;
-
-	/**
-	 * Plugin Class Instance Variable
-	 *
-	 * @var object
-	 */
-	protected static $_instance = null;
-
-	/**
 	 * Data Stores
 	 *
-	 * @var array
+	 * @var class-string<Abstracts\Data_Store_WP>[]
 	 */
 	public static $data_stores = [
 		Session::class,
@@ -69,41 +51,118 @@ class Plugin extends Base_Plugin {
 		Track::class,
 	];
 
-	protected static string $block_prefix = 'bm';
-
 	/**
-	 * Constructor
+	 * Classes whose hooks are registered when the plugin boots.
+	 *
+	 * @var class-string<Hookable>[]
 	 */
-	public function __construct() {
-		parent::__construct();
+	private const BOOT = [
+		Assets::class,
+		Shortcodes::class,
+	];
 
-		$this->init_hooks();
-		$this->load_blocks( 'bm' );
-		$this->boot_data_stores();
-		$this->classes();
+	private static ?self $instance = null;
 
-		do_action( 'bm_event_loaded' );
-
+	public static function instance(): self {
+		return self::$instance ??= new self();
 	}
 
-	/**
-	 * Hooks that are run on the time of init.
-	 */
-	protected function init_hooks(): void {
-		parent::init_hooks();
-
+	public function __construct() {
+		add_action( 'init', [ self::class, 'load_languages' ] );
+		add_action( 'init', [ self::class, 'register_blocks' ], 99 );
+		add_action( 'enqueue_block_editor_assets', [ self::class, 'block_editor_scripts' ], 99 );
 		add_filter( 'block_categories', [ self::class, 'setup_block_categories' ] );
-		Assets::hooks();
-		Shortcodes::hooks();
 
-		(new NextVideo())->load();
-		(new SessionGrid())->load();
+		foreach ( self::BOOT as $class ) {
+			$class::hooks();
+		}
+
+		( new NextVideo() )->load();
+		( new SessionGrid() )->load();
 
 		do_action( 'bm_event_init' );
+
+		foreach ( self::$data_stores as $data_store ) {
+			$data_store::hooks();
+		}
+
+		require_once self::get_path( 'src/customizer.php' );
+
+		do_action( 'bm_event_loaded' );
 	}
 
-	public function classes() {
-		require_once 'customizer.php';
+	/**
+	 * Cloning is forbidden.
+	 */
+	private function __clone() {
+	}
+
+	/**
+	 * Unserializing instances of this class is forbidden.
+	 */
+	public function __wakeup() {
+		throw new \LogicException( 'Cannot unserialize a singleton.' );
+	}
+
+	public static function get_path( string $file = '' ): string {
+		return untrailingslashit( plugin_dir_path( BM_EVENT_FILE_PATH ) ) . '/' . $file;
+	}
+
+	public static function get_url( string $file = '' ): string {
+		return untrailingslashit( plugin_dir_url( BM_EVENT_FILE_PATH ) ) . '/' . $file;
+	}
+
+	public static function get_assets_url( string $file = '' ): string {
+		return self::get_url( 'assets/' . $file );
+	}
+
+	public static function get_version(): string {
+		return static::$version;
+	}
+
+	public static function get_textdomain(): string {
+		return self::TEXTDOMAIN;
+	}
+
+	/**
+	 * Load translations, first from the global languages
+	 * directory and then from the plugin.
+	 */
+	public static function load_languages(): void {
+		$textdomain = self::TEXTDOMAIN;
+		$locale     = is_admin() ? get_user_locale() : get_locale();
+		$locale     = apply_filters( 'plugin_locale', $locale, $textdomain );
+
+		unload_textdomain( $textdomain );
+		load_textdomain( $textdomain, WP_LANG_DIR . "/{$textdomain}/{$textdomain}-{$locale}.mo" );
+		load_plugin_textdomain( $textdomain, false, dirname( plugin_basename( BM_EVENT_FILE_PATH ) ) . '/languages' );
+	}
+
+	/**
+	 * Register the blocks.
+	 */
+	public static function register_blocks(): void {
+		register_block_type( self::BLOCK_PREFIX . '/track-timetable', [
+			'render_callback' => [ Track_Timetable_Block::class, 'render' ],
+			'attributes'      => Track_Timetable_Block::get_attributes(),
+		] );
+	}
+
+	/**
+	 * Load the editor scripts for the blocks.
+	 */
+	public static function block_editor_scripts(): void {
+		$handle = self::BLOCK_PREFIX . '-track-timetable';
+
+		wp_enqueue_script( $handle, self::get_url( 'dist/track-timetable.js' ), [
+			'wp-blocks',
+			'wp-components',
+			'wp-element',
+			'wp-i18n',
+			'wp-block-editor',
+		], self::get_version(), false );
+
+		wp_set_script_translations( $handle, self::TEXTDOMAIN, self::get_path( 'languages/' ) );
 	}
 
 	/**
@@ -123,28 +182,15 @@ class Plugin extends Base_Plugin {
 	}
 
 	/**
-	 * Place the logic where you add blocks in here.
-	 *
-	 * @return mixed
-	 */
-	public function blocks(): void {
-
-		$this->add_block( 'track-timetable', [
-			'render_callback' => [ Track_Timetable_Block::class, 'render' ],
-			'attributes'      => Track_Timetable_Block::get_attributes(),
-		] );
-
-	}
-
-	/**
 	 * Load Template
 	 *
 	 * @param  string  $template_name
+	 * @param  array   $variables
 	 */
 	public static function load_template( $template_name, $variables = [] ): void {
 
-		if($variables) {
-			extract($variables);
+		if ( $variables ) {
+			extract( $variables ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 		}
 
 		$located = locate_template( 'components/' . $template_name );
