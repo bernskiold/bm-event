@@ -20,6 +20,7 @@
 /phpunit.xml.dist     export-ignore
 /eslint.config.cjs    export-ignore
 /webpack.config.js    export-ignore
+/vitest.config.mjs    export-ignore
 /vendor               export-ignore
 /node_modules         export-ignore
 .gitkeep              export-ignore

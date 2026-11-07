@@ -283,7 +283,7 @@ class Session extends Data {
 	}
 
 	public function get_youtube_id(): ?string {
-		preg_match( '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $this->get_embed_url(), $match );
+		preg_match( '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', (string) $this->get_embed_url(), $match );
 
 		return $match[1] ?? null;
 	}

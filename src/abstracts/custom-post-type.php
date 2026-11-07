@@ -115,6 +115,7 @@ abstract class Custom_Post_Type extends Data_Store_WP {
 		 */
 		$post_data = wp_parse_args( $args, [
 			'post_type'    => static::get_key(),
+			'post_title'   => $name,
 			'post_content' => '',
 			'post_status'  => 'publish',
 		] );
@@ -218,21 +219,18 @@ abstract class Custom_Post_Type extends Data_Store_WP {
 	 */
 	public static function does_object_exist( $post_title ): ?int {
 
-		$posts = get_posts( [
-			'post_type'              => static::get_key(),
-			'title'                  => $post_title,
-			'post_status'            => 'all',
-			'numberposts'            => 1,
-			'orderby'                => 'ID',
-			'order'                  => 'ASC',
-			'fields'                 => 'ids',
-			'no_found_rows'          => true,
-			'update_post_term_cache' => false,
-			'update_post_meta_cache' => false,
-			'suppress_filters'       => true,
-		] );
+		global $wpdb;
 
-		return $posts ? (int) $posts[0] : null;
+		// A direct lookup like the deprecated get_page_by_title(). A WP_Query
+		// would run the data stores' pre_get_posts ordering, which requires
+		// the ordering meta and so skips posts without it.
+		$post_id = $wpdb->get_var( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			"SELECT ID FROM $wpdb->posts WHERE post_title = %s AND post_type = %s ORDER BY post_date ASC, ID ASC LIMIT 1",
+			$post_title,
+			static::get_key()
+		) );
+
+		return $post_id ? (int) $post_id : null;
 
 	}
 
