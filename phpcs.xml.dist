@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<ruleset name="BM Event">
+	<description>Coding standards for BM Event.</description>
+
+	<file>.</file>
+
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/dist/*</exclude-pattern>
+	<exclude-pattern>/assets/*/dist/*</exclude-pattern>
+	<exclude-pattern>/blocks/blocks-manifest.php</exclude-pattern>
+	<exclude-pattern>*.asset.php</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="parallel" value="8"/>
+
+	<config name="testVersion" value="8.2-"/>
+	<config name="minimum_wp_version" value="7.0"/>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress">
+		<!-- The plugin uses short array syntax throughout. -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+		<!-- Class files are named after the class, e.g. src/data-stores/session.php. -->
+		<exclude name="WordPress.Files.FileName"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="bm-event"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="bm_event"/>
+				<element value="BernskioldMedia\WP\Event"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

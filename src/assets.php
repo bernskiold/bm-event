@@ -27,12 +27,43 @@ class Assets implements Hookable {
 		// Styles.
 		add_action( 'wp_enqueue_scripts', [ self::class, 'public_styles' ] );
 		add_action( 'enqueue_block_editor_assets', [ self::class, 'block_editor_assets' ] );
-		// add_action( 'admin_enqueue_scripts', [ self::class, 'admin_styles' ] );
 
 		// Scripts.
 		add_action( 'wp_enqueue_scripts', [ self::class, 'public_scripts' ] );
-		// add_action( 'admin_enqueue_scripts', [ self::class, 'admin_scripts' ] );
 
+	}
+
+	/**
+	 * Get the dependencies and version that wp-scripts generated for
+	 * a built file, given its path relative to the plugin without
+	 * the extension.
+	 *
+	 * @param  string $file  E.g. 'assets/scripts/dist/app'.
+	 *
+	 * @return array{dependencies: string[], version: string}
+	 */
+	public static function get_asset_meta( string $file ): array {
+		$path = Plugin::get_path( $file . '.asset.php' );
+
+		$meta = file_exists( $path ) ? require $path : [];
+
+		return [
+			'dependencies' => $meta['dependencies'] ?? [],
+			'version'      => $meta['version'] ?? Plugin::get_version(),
+		];
+	}
+
+	/**
+	 * Register a built script with its generated dependencies.
+	 *
+	 * @param  string   $handle
+	 * @param  string   $file          Path relative to the plugin without the extension.
+	 * @param  string[] $dependencies  Additional dependencies.
+	 */
+	protected static function register_script( string $handle, string $file, array $dependencies = [] ): void {
+		$meta = self::get_asset_meta( $file );
+
+		wp_register_script( $handle, Plugin::get_url( $file . '.js' ), array_unique( array_merge( $meta['dependencies'], $dependencies ) ), $meta['version'], true );
 	}
 
 	/**
@@ -50,7 +81,7 @@ class Assets implements Hookable {
 		/**
 		 * Register Main Stylesheet.
 		 */
-		wp_register_style( 'bm-event-public', Plugin::get_assets_url() . '/styles/dist/app.css', false, Plugin::get_version(), 'all' );
+		wp_register_style( 'bm-event-public', Plugin::get_assets_url( 'styles/dist/app.css' ), [], self::get_asset_meta( 'assets/styles/dist/app' )['version'], 'all' );
 		wp_register_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.0.0/dist/css/select2.min.css', false, '4.0.0', 'all' );
 
 		/**
@@ -61,7 +92,7 @@ class Assets implements Hookable {
 			wp_enqueue_style( 'select2' );
 		}
 
-		if(has_shortcode($post->post_content, 'bm_display_events')) {
+		if ( has_shortcode( $post->post_content, 'bm_display_events' ) ) {
 			wp_enqueue_style( 'select2' );
 		}
 	}
@@ -77,46 +108,23 @@ class Assets implements Hookable {
 			return;
 		}
 
-		wp_enqueue_style( 'bm-event-block', Plugin::get_assets_url( 'styles/dist/app.css' ), false, Plugin::get_version(), 'all' );
-
-	}
-
-	/**
-	 * Registers and enqueues plugin admin stylesheets.
-	 **/
-	public static function admin_styles() {
-
-		/**
-		 * Register Main Stylesheet.
-		 */
-		wp_register_style( 'bm-event-admin', Plugin::get_assets_url() . '/styles/dist/admin.css', false, Plugin::get_version(), 'all' );
-
-		/**
-		 * Enqueue Stylesheets.
-		 */
-		wp_enqueue_style( 'bm-event-admin' );
+		wp_enqueue_style( 'bm-event-block', Plugin::get_assets_url( 'styles/dist/app.css' ), [], self::get_asset_meta( 'assets/styles/dist/app' )['version'], 'all' );
 
 	}
 
 	/**
 	 * Enqueue Scripts on public side
-	 *
-	 * We want to allow the use of good script debugging here too,
-	 * so be mindful and use the SCRIPTS_DEBUG constant
-	 * to load both minified for production and non-minified files
-	 * for testing purposes.
 	 **/
 	public static function public_scripts() {
 		global $post;
 
 		/**
-		 * Register the main, minified
-		 * and compiled script file.
+		 * Register the compiled script files.
 		 */
-		wp_register_script( 'bm-event-app', Plugin::get_assets_url() . '/scripts/dist/app.js', [ 'jquery', 'select2' ], Plugin::get_version(), true );
 		wp_register_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.0.0/dist/js/select2.min.js', [ 'jquery' ], '4.0.0', true );
-		wp_register_script('liveviewer', Plugin::get_assets_url('/scripts/dist/live-viewer.js'), [], Plugin::get_version(), true);
-		wp_register_script('time-switcher', Plugin::get_assets_url('/scripts/dist/time-switcher.js'), [], Plugin::get_version(), true);
+		self::register_script( 'bm-event-app', 'assets/scripts/dist/app', [ 'jquery', 'select2' ] );
+		self::register_script( 'liveviewer', 'assets/scripts/dist/live-viewer' );
+		self::register_script( 'time-switcher', 'assets/scripts/dist/time-switcher' );
 
 		/**
 		 * Only load if we have the right blocks.
@@ -137,44 +145,23 @@ class Assets implements Hookable {
 
 		}
 
-		if(has_shortcode($post->post_content, 'bm_liveviewer')) {
+		if ( has_shortcode( $post->post_content, 'bm_liveviewer' ) ) {
 			wp_enqueue_script( 'liveviewer' );
 
-			wp_localize_script('liveviewer', 'BMELiveViewer', [
-				'apiUrl' => rest_url('bm-events/v1'),
-				'pollingInterval' => 30000
-			]);
+			wp_localize_script( 'liveviewer', 'BMELiveViewer', [
+				'apiUrl'          => rest_url( 'bm-events/v1' ),
+				'pollingInterval' => 30000,
+			] );
 		}
 
-		if(has_shortcode($post->post_content, 'bm_display_events')) {
+		if ( has_shortcode( $post->post_content, 'bm_display_events' ) ) {
 			wp_enqueue_script( 'select2' );
 			wp_enqueue_script( 'time-switcher' );
 
-			wp_localize_script('time-switcher', 'BMETimeSwitcher', [
-				'apiUrl' => rest_url('bm-events/v1')
-			]);
+			wp_localize_script( 'time-switcher', 'BMETimeSwitcher', [
+				'apiUrl' => rest_url( 'bm-events/v1' ),
+			] );
 		}
-	}
-
-	/**
-	 * Enqueue Scripts on admin side
-	 *
-	 * We want to allow the use of good script debugging here too,
-	 * so be mindful and use the SCRIPTS_DEBUG constant
-	 * to load both minified for production and non-minified files
-	 * for testing purposes.
-	 **/
-	public static function admin_scripts() {
-
-		/**
-		 * Register the main, minified
-		 * and compiled script file.
-		 */
-		wp_register_script( 'bm-event-admin', Plugin::get_assets_url() . '/scripts/dist/admin.js', [ 'jquery' ], Plugin::get_version(), true );
-
-		// Enqueue.
-		wp_enqueue_script( 'bm-event-admin' );
-
 	}
 
 	/**

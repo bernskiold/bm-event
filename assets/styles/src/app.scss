@@ -1,6 +1,6 @@
-@import "public/components/session-grid";
-@import "public/components/session-list";
-@import "public/components/speaker-list";
+@use "public/components/session-grid";
+@use "public/components/session-list";
+@use "public/components/speaker-list";
 
 .track-timetable-timezone-selector {
 	margin: 1.5rem;

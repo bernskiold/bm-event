@@ -153,14 +153,21 @@ class Plugin {
 	 */
 	public static function block_editor_scripts(): void {
 		$handle = self::BLOCK_PREFIX . '-track-timetable';
+		$meta   = Assets::get_asset_meta( 'dist/track-timetable' );
 
-		wp_enqueue_script( $handle, self::get_url( 'dist/track-timetable.js' ), [
+		// The editor script reads the packages from the `wp` global,
+		// so they are not all picked up by the dependency extraction.
+		$dependencies = array_unique( array_merge( $meta['dependencies'], [
+			'wp-api-fetch',
 			'wp-blocks',
 			'wp-components',
+			'wp-data',
 			'wp-element',
 			'wp-i18n',
 			'wp-block-editor',
-		], self::get_version(), false );
+		] ) );
+
+		wp_enqueue_script( $handle, self::get_url( 'dist/track-timetable.js' ), $dependencies, $meta['version'], false );
 
 		wp_set_script_translations( $handle, self::TEXTDOMAIN, self::get_path( 'languages/' ) );
 	}
