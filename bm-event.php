@@ -3,7 +3,7 @@
  * Plugin Name: BM Event
  * Plugin URI:  https://bernskioldmedia.com
  * Description: Functionality to help you market and manage an event. From showing speakers to a live agenda for one or multiple days.
- * Version:     1.2.4
+ * Version:     2.0.0
  * Requires at least: 7.0
  * Tested up to: 7.1
  * Requires PHP: 8.2

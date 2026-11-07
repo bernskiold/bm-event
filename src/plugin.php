@@ -33,7 +33,7 @@ class Plugin {
 	 *
 	 * @var string
 	 */
-	protected static $version = '1.2.4';
+	protected static $version = '2.0.0';
 
 	/**
 	 * Data Stores
