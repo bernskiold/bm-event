@@ -218,13 +218,21 @@ abstract class Custom_Post_Type extends Data_Store_WP {
 	 */
 	public static function does_object_exist( $post_title ): ?int {
 
-		$post = get_page_by_title( $post_title, OBJECT, static::get_key() );
+		$posts = get_posts( [
+			'post_type'              => static::get_key(),
+			'title'                  => $post_title,
+			'post_status'            => 'all',
+			'numberposts'            => 1,
+			'orderby'                => 'ID',
+			'order'                  => 'ASC',
+			'fields'                 => 'ids',
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+			'update_post_meta_cache' => false,
+			'suppress_filters'       => true,
+		] );
 
-		if ( null !== $post ) {
-			return (int) $post->ID;
-		}
-
-		return null;
+		return $posts ? (int) $posts[0] : null;
 
 	}
 

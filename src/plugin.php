@@ -26,11 +26,6 @@ class Plugin {
 	public const TEXTDOMAIN = 'bm-event';
 
 	/**
-	 * Prefix used for the block names and script handles.
-	 */
-	public const BLOCK_PREFIX = 'bm';
-
-	/**
 	 * Version
 	 *
 	 * Kept as a property in this exact form because the release
@@ -70,8 +65,7 @@ class Plugin {
 	public function __construct() {
 		add_action( 'init', [ self::class, 'load_languages' ] );
 		add_action( 'init', [ self::class, 'register_blocks' ], 99 );
-		add_action( 'enqueue_block_editor_assets', [ self::class, 'block_editor_scripts' ], 99 );
-		add_filter( 'block_categories', [ self::class, 'setup_block_categories' ] );
+		add_filter( 'block_categories_all', [ self::class, 'setup_block_categories' ] );
 
 		foreach ( self::BOOT as $class ) {
 			$class::hooks();
@@ -139,37 +133,21 @@ class Plugin {
 	}
 
 	/**
-	 * Register the blocks.
+	 * Register the blocks from their block.json files.
+	 *
+	 * The block metadata is read from the manifest that
+	 * `npm run build` generates.
 	 */
 	public static function register_blocks(): void {
-		register_block_type( self::BLOCK_PREFIX . '/track-timetable', [
-			'render_callback' => [ Track_Timetable_Block::class, 'render' ],
-			'attributes'      => Track_Timetable_Block::get_attributes(),
-		] );
-	}
+		Assets::register_block_styles();
 
-	/**
-	 * Load the editor scripts for the blocks.
-	 */
-	public static function block_editor_scripts(): void {
-		$handle = self::BLOCK_PREFIX . '-track-timetable';
-		$meta   = Assets::get_asset_meta( 'dist/track-timetable' );
+		wp_register_block_types_from_metadata_collection( self::get_path( 'blocks' ), self::get_path( 'blocks/blocks-manifest.php' ) );
 
-		// The editor script reads the packages from the `wp` global,
-		// so they are not all picked up by the dependency extraction.
-		$dependencies = array_unique( array_merge( $meta['dependencies'], [
-			'wp-api-fetch',
-			'wp-blocks',
-			'wp-components',
-			'wp-data',
-			'wp-element',
-			'wp-i18n',
-			'wp-block-editor',
-		] ) );
+		// Core sets up translations for block scripts from the global
+		// languages directory only. Also look in the plugin.
+		wp_set_script_translations( generate_block_asset_handle( Track_Timetable_Block::NAME, 'editorScript' ), self::TEXTDOMAIN, self::get_path( 'languages/' ) );
 
-		wp_enqueue_script( $handle, self::get_url( 'dist/track-timetable.js' ), $dependencies, $meta['version'], false );
-
-		wp_set_script_translations( $handle, self::TEXTDOMAIN, self::get_path( 'languages/' ) );
+		add_filter( 'script_module_data_' . Track_Timetable_Block::get_view_module_id(), [ Track_Timetable_Block::class, 'view_module_data' ] );
 	}
 
 	/**
@@ -183,7 +161,7 @@ class Plugin {
 		return array_merge( $categories, [
 			[
 				'slug'  => 'event',
-				'title' => __( 'Events', 'bm-events' ),
+				'title' => __( 'Events', 'bm-event' ),
 			],
 		] );
 	}

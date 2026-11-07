@@ -1,50 +1,34 @@
 /**
- * Call a REST API endpoint every five minutes to check for new end time and new end video.
+ * Live viewer for the [bm_liveviewer] shortcode.
  *
- * On the end time, refresh and load new video.
+ * Polls the REST API and reloads the page when the next session is
+ * about to start, so that its video is loaded.
  */
-( function() {
 
-	const ENDPOINT = BMELiveViewer.apiUrl + '/next-video';
-	let hasNextVideo = false;
-	let eventId = parseInt( document.querySelector( '.session-player' ).dataset.eventId );
+/**
+ * Internal dependencies
+ */
+import { getModuleData } from './browser';
 
-	const getData = async () => {
-		fetch( ENDPOINT )
-			.then( res => res.json() )
-			.then( ( res ) => {
-				hasNextVideo = !! res.id;
+const { apiUrl = '', pollingInterval = 30000 } = getModuleData(
+	'bm-event-live-viewer'
+);
 
-				if ( res.id !== eventId && res.should_refresh ) {
-					window.location.reload();
-				}
-			} );
-	};
+const player = document.querySelector( '.session-player' );
+const eventId = player ? parseInt( player.dataset.eventId, 10 ) || 0 : 0;
 
-	const poll = async ( { fn, interval, maxAttempts } ) => {
-		let attempts = 0;
-
-		const executePoll = async ( resolve, reject ) => {
-			const result = await fn();
-			attempts++;
-
-			if ( result ) {
-				return resolve( result );
-			} else if ( maxAttempts && attempts === maxAttempts ) {
-				return reject( new Error( 'Exceeded max attempts' ) );
-			} else {
-				setTimeout( executePoll, interval, resolve, reject );
+const checkForNextVideo = () =>
+	window
+		.fetch( `${ apiUrl }/next-video` )
+		.then( ( res ) => res.json() )
+		.then( ( res ) => {
+			if ( res.id !== eventId && res.should_refresh ) {
+				window.location.reload();
 			}
-		};
+		} )
+		.catch( () => {} );
 
-		return new Promise( executePoll );
-	};
-
-	if ( eventId !== 0 ) {
-		poll( {
-			fn: getData,
-			interval: BMELiveViewer.pollingInterval,
-		} );
-	}
-
-} )( BMELiveViewer );
+if ( player && eventId !== 0 ) {
+	window.setInterval( checkForNextVideo, pollingInterval );
+	checkForNextVideo();
+}

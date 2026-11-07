@@ -1,12 +1,15 @@
 const path = require( 'path' );
+const fastGlob = require( 'fast-glob' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const WebpackBar = require( 'webpackbar' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 /*
- * `defaultConfig.plugins` holds shared plugin *instances*. Give each config
- * its own `DependencyExtractionWebpackPlugin` so that the configs below never
- * share state between compilers (see bm-block-library's webpack config).
+ * `defaultConfig.plugins` holds shared plugin *instances*. The module config
+ * below runs in module mode, which would flip a shared
+ * `DependencyExtractionWebpackPlugin` into module externalisation for the
+ * script configs as well. Give each config a fresh instance, as in
+ * bm-block-library.
  */
 const withFreshExternals = ( plugins ) =>
 	plugins.map( ( plugin ) =>
@@ -16,15 +19,20 @@ const withFreshExternals = ( plugins ) =>
 	);
 
 /*
- * Editor script for the Track Timetable block.
+ * Editor scripts: blocks/<name>/index.js -> dist/blocks/<name>.js, which the
+ * block's block.json references as its editorScript.
  */
 const blocks = {
 	...defaultConfig,
-	entry: {
-		'track-timetable': './src/blocks/track-timetable/track-timetable.js',
-	},
+	entry: fastGlob.sync( './blocks/*/index.js' ).reduce(
+		( entries, file ) => ( {
+			...entries,
+			[ path.basename( path.dirname( file ) ) ]: file,
+		} ),
+		{}
+	),
 	output: {
-		path: path.resolve( process.cwd(), 'dist' ),
+		path: path.resolve( process.cwd(), 'dist', 'blocks' ),
 		filename: '[name].js',
 		chunkFilename: '[name].js',
 	},
@@ -35,25 +43,62 @@ const blocks = {
 };
 
 /*
- * Front-end scripts and the stylesheet.
+ * The front-end stylesheet.
  */
-const publicAssets = {
+const styles = {
 	...defaultConfig,
 	entry: {
-		'scripts/dist/app': './assets/scripts/src/index.js',
-		'scripts/dist/live-viewer': './assets/scripts/src/live-viewer.js',
-		'scripts/dist/time-switcher': './assets/scripts/src/time-switcher.js',
-		'styles/dist/app': './assets/styles/src/app.scss',
+		app: './assets/styles/src/app.scss',
 	},
 	output: {
-		path: path.resolve( process.cwd(), 'assets' ),
+		path: path.resolve( process.cwd(), 'assets', 'styles', 'dist' ),
 		filename: '[name].js',
 		chunkFilename: '[name].js',
 	},
 	plugins: [
 		...withFreshExternals( defaultConfig.plugins ),
-		new WebpackBar( { name: 'Public', color: '#5aec1c' } ),
+		new WebpackBar( { name: 'Styles', color: '#5aec1c' } ),
 	],
 };
 
-module.exports = [ blocks, publicAssets ];
+/*
+ * Front-end script modules: the block's viewScriptModule and the
+ * shortcode scripts, loaded with wp_register_script_module().
+ */
+const modules = {
+	...defaultConfig,
+	entry: {
+		...fastGlob.sync( './blocks/*/view.js' ).reduce(
+			( entries, file ) => ( {
+				...entries,
+				[ `dist/blocks/${ path.basename(
+					path.dirname( file )
+				) }/view` ]: file,
+			} ),
+			{}
+		),
+		'assets/scripts/dist/live-viewer':
+			'./assets/scripts/src/live-viewer.js',
+		'assets/scripts/dist/time-switcher':
+			'./assets/scripts/src/time-switcher.js',
+	},
+	output: {
+		path: process.cwd(),
+		filename: '[name].js',
+		chunkFilename: '[name].js',
+		module: true,
+		library: { type: 'module' },
+		environment: { module: true, dynamicImport: true },
+	},
+	experiments: {
+		...( defaultConfig.experiments || {} ),
+		outputModule: true,
+	},
+	externalsType: 'module',
+	plugins: [
+		...withFreshExternals( defaultConfig.plugins ),
+		new WebpackBar( { name: 'Modules', color: '#ec1c5f' } ),
+	],
+};
+
+module.exports = [ blocks, styles, modules ];

@@ -92,7 +92,7 @@ abstract class Taxonomy extends Data_Store_WP {
 	 */
 	public static function create( $name, $args = [] ): int {
 
-		if ( ! isset( $data['name'] ) ) {
+		if ( ! $name ) {
 			throw new Data_Store_Exception(
 				'Tried to create a term, but the term name was not passed correctly.',
 				[
@@ -121,7 +121,7 @@ abstract class Taxonomy extends Data_Store_WP {
 			throw new Data_Store_Exception(
 				'Could not create a new term.',
 				[
-					'name'    => $data['name'],
+					'name'    => $name,
 					'message' => $response->get_error_message(),
 				]
 			);
@@ -130,7 +130,7 @@ abstract class Taxonomy extends Data_Store_WP {
 		Log::info(
 			'Successfully created a new term.',
 			[
-				'name'    => $data['name'],
+				'name'    => $name,
 				'term_id' => $response['term_id'],
 			]
 		);
@@ -164,7 +164,7 @@ abstract class Taxonomy extends Data_Store_WP {
 				'Could not update term.',
 				[
 					'taxonomy' => static::get_key(),
-					'name'     => $args['name'],
+					'name'     => $args['name'] ?? null,
 					'term_id'  => $term_id,
 					'message'  => $updated->get_error_message(),
 				]
@@ -176,7 +176,7 @@ abstract class Taxonomy extends Data_Store_WP {
 			[
 				'taxonomy' => static::get_key(),
 				'term_id'  => $term_id,
-				'name'     => $args['name'],
+				'name'     => $args['name'] ?? null,
 			]
 		);
 
@@ -271,10 +271,10 @@ abstract class Taxonomy extends Data_Store_WP {
 		$term_exists = term_exists( $term, static::get_key() );
 
 		if ( is_array( $term_exists ) ) {
-			return $term_exists['term_id'];
+			return (int) $term_exists['term_id'];
 		}
 
-		return $term_exists;
+		return $term_exists ? (int) $term_exists : null;
 	}
 
 	/**
