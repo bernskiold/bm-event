@@ -61,6 +61,35 @@ class Session extends Abstracts\Custom_Post_Type {
 	];
 
 	/**
+	 * Sites registered after this date (midnight UTC, 2022-07-01) store
+	 * session times in the combined session_start_datetime and
+	 * session_end_datetime fields. Older sites use the separate date,
+	 * start time and end time fields.
+	 */
+	public const DATETIME_FIELDS_SINCE = 1656633600;
+
+	/**
+	 * Get when the current site was registered, as a timestamp.
+	 *
+	 * Only multisite networks record this. A single site has no
+	 * registration date and gets the datetime fields. Filter
+	 * `bm_event_site_registered_timestamp` to change this.
+	 */
+	public static function get_site_registered_timestamp(): int {
+		$timestamp = PHP_INT_MAX;
+
+		if ( is_multisite() ) {
+			$site = get_site( get_current_blog_id() );
+
+			if ( $site && $site->registered ) {
+				$timestamp = (int) strtotime( $site->registered );
+			}
+		}
+
+		return (int) apply_filters( 'bm_event_site_registered_timestamp', $timestamp );
+	}
+
+	/**
 	 * Register Post Type
 	 *
 	 * @see https://codex.wordpress.org/Function_Reference/register_post_type
@@ -150,10 +179,8 @@ class Session extends Abstracts\Custom_Post_Type {
 			return $query;
 		}
 
-		$site = get_site(get_current_blog_id());
-
 		// Yes...we are really doing this to migrate to a new structure!
-		if(strtotime($site->registered) >= strtotime('2022-07-01')) {
+		if ( self::get_site_registered_timestamp() >= self::DATETIME_FIELDS_SINCE ) {
 			$query->set( 'orderby', 'meta_value' );
 			$query->set( 'meta_type', 'DATETIME' );
 			$query->set( 'meta_key', 'session_start_datetime' );
@@ -174,7 +201,7 @@ class Session extends Abstracts\Custom_Post_Type {
 	 */
 	public static function fields(): void {
 
-		$site = get_site(get_current_blog_id());
+		$registered = self::get_site_registered_timestamp();
 
 		acf_add_local_field_group( [
 			'key'                   => 'group_5ecd0f226b78d',
@@ -204,7 +231,7 @@ class Session extends Abstracts\Custom_Post_Type {
 					'label'             => __( 'Short Description', 'bm-event' ),
 					'name'              => 'session_short_description',
 					'type'              => 'textarea',
-					'instructions'      => __( 'The main content will be shown on the single event. This short description will show in lists and session tables.', 'bm-events' ),
+					'instructions'      => __( 'The main content will be shown on the single event. This short description will show in lists and session tables.', 'bm-event' ),
 					'required'          => 0,
 					'conditional_logic' => 0,
 					'wrapper'           => [
@@ -305,7 +332,7 @@ class Session extends Abstracts\Custom_Post_Type {
 			'description'           => __( 'Recording or live event video.', 'bm-event' ),
 		] );
 
-		if(strtotime($site->registered) <= strtotime('2022-07-01')) {
+		if ( $registered <= self::DATETIME_FIELDS_SINCE ) {
 			acf_add_local_field_group([
 				'key' => 'group_5ecd095bf2280',
 				'title' => __('Date & Time', 'bm-event'),
@@ -382,7 +409,7 @@ class Session extends Abstracts\Custom_Post_Type {
 			]);
 		}
 
-		if(strtotime($site->registered) > strtotime('2022-07-01')) {
+		if ( $registered > self::DATETIME_FIELDS_SINCE ) {
 
 			acf_add_local_field_group([
 				'key' => 'group_637238a0eca63',

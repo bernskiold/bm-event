@@ -5,37 +5,46 @@ namespace BernskioldMedia\WP\Event\Blocks\Track_Timetable;
 use BernskioldMedia\WP\Event\Data_Stores;
 use BernskioldMedia\WP\Event\Plugin;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Class Track_Timetable_Block
+ *
+ * The block is registered from blocks/track-timetable/block.json and
+ * rendered through its render.php, which calls render() below.
  *
  * @package BernskioldMedia\WP\Event\Blocks\Track_Timetable
  */
 class Track_Timetable_Block {
 
 	/**
-	 * Since this is a dynamically generated block, we
-	 * define the attributes here using PHP.
-	 *
-	 * @var array
+	 * Block name.
 	 */
-	protected static array $attributes = [
-		'track_id'             => [
-			'type'    => 'number',
-			'default' => 0,
-		],
-		'showTimezoneSelector' => [
-			'type'    => 'boolean',
-			'default' => false,
-		],
-	];
+	public const NAME = 'bm/track-timetable';
 
 	/**
-	 * Get the attributes to register the block with.
+	 * Get the ID of the block's view script module.
+	 */
+	public static function get_view_module_id(): string {
+		return generate_block_asset_handle( self::NAME, 'viewScriptModule' );
+	}
+
+	/**
+	 * Data for the view script module (the timezone selector).
+	 *
+	 * @param  array $data
 	 *
 	 * @return array
 	 */
-	public static function get_attributes(): array {
-		return static::$attributes;
+	public static function view_module_data( array $data ): array {
+		return array_merge( $data, [
+			'texts'        => [
+				'selectTz' => __( 'Select Your Timezone...', 'bm-event' ),
+				'tzLabel'  => __( 'See the schedule in your local time.', 'bm-event' ),
+			],
+			'gmtOffset'    => get_option( 'gmt_offset' ),
+			'siteTimezone' => get_option( 'timezone_string' ),
+		] );
 	}
 
 	/**
@@ -52,7 +61,7 @@ class Track_Timetable_Block {
 			'posts_per_page' => 100, // "Everything".
 		];
 
-		if ( $attributes['track_id'] ) {
+		if ( ! empty( $attributes['track_id'] ) ) {
 			$query_args['tax_query'][] = [
 				'taxonomy' => Data_Stores\Track::get_key(),
 				'terms'    => $attributes['track_id'],
@@ -66,8 +75,12 @@ class Track_Timetable_Block {
 
 	/**
 	 * Get style of the block.
+	 *
+	 * @param  array $attributes
+	 *
+	 * @return string Either "grid" or "list".
 	 */
-	protected static function get_style( $attributes ) {
+	public static function get_style( $attributes ): string {
 
 		if ( ! isset( $attributes['className'] ) ) {
 			return 'list';
@@ -86,36 +99,41 @@ class Track_Timetable_Block {
 	 *
 	 * @param  array  $attributes
 	 *
-	 * @return false|string
+	 * @return string
 	 */
 	public static function render( array $attributes ): string {
 
 		$posts = self::get_query( $attributes );
 
-		$classes   = [ 'sessions' ];
-		$classes[] = 'is-style-' . self::get_style( $attributes );
-		$classes   = implode( ' ', $classes );
+		if ( ! $posts->have_posts() ) {
+			return '';
+		}
+
+		// The anchor support adds the id, and the custom class name support
+		// any additional classes.
+		$wrapper_attributes = [
+			'class' => 'sessions is-style-' . self::get_style( $attributes ),
+		];
 
 		ob_start();
+		?>
 
-		if ( $posts->have_posts() ) : ?>
+		<div <?php echo get_block_wrapper_attributes( $wrapper_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 
-			<div class="<?php echo esc_attr( $classes ); ?>" id="<?php echo esc_attr( isset( $attributes['anchor'] ) ? $attributes['anchor'] : '' ); ?>">
+			<?php if ( ! empty( $attributes['showTimezoneSelector'] ) ) : ?>
+				<div class="track-timetable-timezone-selector js--track-timetable-timezone-selector"></div>
+			<?php endif; ?>
 
-				<?php if ( isset( $attributes['showTimezoneSelector'] ) && $attributes['showTimezoneSelector'] ) : ?>
-					<div class="track-timetable-timezone-selector js--track-timetable-timezone-selector"></div>
-				<?php endif; ?>
+			<?php while ( $posts->have_posts() ) : $posts->the_post(); // @codingStandardsIgnoreLine ?>
+				<?php Plugin::load_template( 'event/item-' . self::get_style( $attributes ) ); ?>
+			<?php endwhile; ?>
 
-				<?php while ( $posts->have_posts() ) : $posts->the_post(); // @codingStandardsIgnoreLine ?>
-					<?php Plugin::load_template( 'event/item-' . self::get_style( $attributes ) ); ?>
-				<?php endwhile; ?>
-
-			</div>
+		</div>
 
 		<?php
-		endif;
+		wp_reset_postdata();
 
-		return ob_get_clean();
+		return (string) ob_get_clean();
 
 	}
 

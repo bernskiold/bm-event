@@ -4,10 +4,22 @@ use BernskioldMedia\WP\Event\Data\Session;
 
 $sessions = Session::get_all( ['meta_key' => 'session_start_datetime', 'meta_type' => 'DATETIME']);
 
-$timezone = array_key_exists( 'event_timezone', $_COOKIE) ? $_COOKIE['event_timezone'] : 'Europe/London';
+$timezone = array_key_exists( 'event_timezone', $_COOKIE ) ? sanitize_text_field( wp_unslash( $_COOKIE['event_timezone'] ) ) : 'Europe/London';
 $date_timezone = str_replace( 'UTC', '', $timezone );
 
-if( $date_timezone === '' ){
+if ( $date_timezone === '' ) {
+	$date_timezone = 'Europe/London';
+}
+
+// Manual offsets from wp_timezone_choice() come as e.g. "UTC+5.5". Turn them into "+05:30".
+if ( preg_match( '/^([+-])(\d{1,2})(?:\.(\d+))?$/', $date_timezone, $offset ) ) {
+	$date_timezone = sprintf( '%s%02d:%02d', $offset[1], $offset[2], round( (float) ( '0.' . ( $offset[3] ?? '0' ) ) * 60 ) );
+}
+
+// The cookie is set by the visitor, so fall back rather than fail on an unknown zone.
+try {
+	new DateTimeZone( $date_timezone );
+} catch ( Exception $e ) {
 	$date_timezone = 'Europe/London';
 }
 

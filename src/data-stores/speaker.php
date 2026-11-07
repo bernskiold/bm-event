@@ -234,7 +234,7 @@ class Speaker extends Abstracts\Custom_Post_Type {
 					'name'              => 'speaker_short_biography',
 					'type'              => 'textarea',
 					'instructions'      => __( 'The main content will be shown on the speaker page, the short description can be shown in grids and lists and on sessions.',
-						'bm-events' ),
+						'bm-event' ),
 					'required'          => 0,
 					'conditional_logic' => 0,
 					'wrapper'           => [

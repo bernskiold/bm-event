@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "bm/track-timetable",
+	"title": "Track Timetable",
+	"description": "Show a timetable for a single track.",
+	"category": "event",
+	"textdomain": "bm-event",
+	"keywords": [ "calendar", "events", "agenda" ],
+	"attributes": {
+		"track_id": {
+			"type": "number",
+			"default": 0
+		},
+		"showTimezoneSelector": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": false
+	},
+	"styles": [
+		{ "name": "list", "label": "Agenda", "isDefault": true },
+		{ "name": "grid", "label": "Visual Grid" }
+	],
+	"editorScript": "file:../../dist/blocks/track-timetable.js",
+	"editorStyle": "bm-event-block",
+	"style": "bm-event-public",
+	"viewScriptModule": "file:../../dist/blocks/track-timetable/view.js",
+	"render": "file:./render.php"
+}

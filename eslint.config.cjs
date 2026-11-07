@@ -1,8 +1,8 @@
 /**
  * ESLint flat config.
  *
- * Reuses the @wordpress/scripts default config, the same way as
- * bm-block-library, so the bundled @wordpress/eslint-plugin never drifts.
+ * Reuses the `@wordpress/scripts` default config, the same way as
+ * bm-block-library, so the bundled `@wordpress/eslint-plugin` never drifts.
  */
 
 /**

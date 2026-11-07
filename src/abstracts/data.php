@@ -273,7 +273,7 @@ abstract class Data implements Data_Interface {
 		$data = [];
 
 		foreach ( static::$data_store::$metadata as $meta ) {
-			$data[ $meta ] = $this->{"get_$data"};
+			$data[ $meta ] = method_exists( $this, "get_$meta" ) ? $this->{"get_$meta"}() : null;
 		}
 
 		return $data;
