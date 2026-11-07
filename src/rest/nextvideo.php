@@ -4,12 +4,12 @@ namespace BernskioldMedia\WP\Event\Rest;
 
 use BernskioldMedia\WP\Event\Queries;
 use BernskioldMedia\WP\Event\SessionHelper;
-use BernskioldMedia\WP\PluginBase\Rest\RestEndpoint;
+use BernskioldMedia\WP\Event\Abstracts\REST_Endpoint;
 use WP_REST_Response;
 
 defined( 'ABSPATH' ) || exit;
 
-class NextVideo extends RestEndpoint {
+class NextVideo extends REST_Endpoint {
 
 	protected $namespace = 'bm-events';
 

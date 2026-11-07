@@ -4,100 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fb827fc9ae25f2b6c74b45b163faea1",
+    "content-hash": "2ca5fcc4d0c4f1b569dfa150984a180c",
     "packages": [
-        {
-            "name": "bernskioldmedia/block-plugin-support",
-            "version": "1.4.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bernskioldmedia/Block-Plugin-Support.git",
-                "reference": "a0f6f6136abd6973e4741cb35e5bf3ba4f39573a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bernskioldmedia/Block-Plugin-Support/zipball/a0f6f6136abd6973e4741cb35e5bf3ba4f39573a",
-                "reference": "a0f6f6136abd6973e4741cb35e5bf3ba4f39573a",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4|^8.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "BernskioldMedia\\WP\\Block_Plugin_Support\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Bernskiold Media",
-                    "email": "info@bernskioldmedia.com"
-                },
-                {
-                    "name": "Erik Bernskiold",
-                    "email": "erik@bernskioldmedia.com"
-                }
-            ],
-            "description": "A reusable way of adding block support to a WordPress plugin.",
-            "support": {
-                "issues": "https://github.com/bernskioldmedia/Block-Plugin-Support/issues",
-                "source": "https://github.com/bernskioldmedia/Block-Plugin-Support/tree/1.4.4"
-            },
-            "time": "2021-07-17T15:40:41+00:00"
-        },
-        {
-            "name": "bernskioldmedia/wp-plugin-base",
-            "version": "1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bernskioldmedia/wp-plugin-base.git",
-                "reference": "d7524bd93d4b8104febd69a421b4612b6c78ce8d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bernskioldmedia/wp-plugin-base/zipball/d7524bd93d4b8104febd69a421b4612b6c78ce8d",
-                "reference": "d7524bd93d4b8104febd69a421b4612b6c78ce8d",
-                "shasum": ""
-            },
-            "require": {
-                "monolog/monolog": "~1.25",
-                "php": ">=7.2"
-            },
-            "require-dev": {
-                "10up/wp_mock": "dev-master",
-                "bernskioldmedia/phpcs-wordpress": "dev-master",
-                "phpunit/phpunit": "^8.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "BernskioldMedia\\WP\\PluginBase\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Bernskiold Media",
-                    "email": "info@bernskioldmedia.com",
-                    "homepage": "https://bernskioldmedia.com",
-                    "role": "agency"
-                }
-            ],
-            "description": "A WordPress plugin base that contains helpful base classes and functions that we can extend upon when developing WordPress plugins.",
-            "support": {
-                "issues": "https://github.com/bernskioldmedia/wp-plugin-base/issues",
-                "source": "https://github.com/bernskioldmedia/wp-plugin-base/tree/1.0.4"
-            },
-            "time": "2020-09-26T15:10:54+00:00"
-        },
         {
             "name": "composer/installers",
             "version": "v1.12.0",
@@ -248,153 +156,17 @@
                 }
             ],
             "time": "2021-09-13T08:19:44+00:00"
-        },
-        {
-            "name": "monolog/monolog",
-            "version": "1.27.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "904713c5929655dc9b97288b69cfeedad610c9a1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/904713c5929655dc9b97288b69cfeedad610c9a1",
-                "reference": "904713c5929655dc9b97288b69cfeedad610c9a1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "psr/log": "~1.0"
-            },
-            "provide": {
-                "psr/log-implementation": "1.0.0"
-            },
-            "require-dev": {
-                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
-                "doctrine/couchdb": "~1.0@dev",
-                "graylog2/gelf-php": "~1.0",
-                "php-amqplib/php-amqplib": "~2.4",
-                "php-console/php-console": "^3.1.3",
-                "phpstan/phpstan": "^0.12.59",
-                "phpunit/phpunit": "~4.5",
-                "ruflin/elastica": ">=0.90 <3.0",
-                "sentry/sentry": "^0.13",
-                "swiftmailer/swiftmailer": "^5.3|^6.0"
-            },
-            "suggest": {
-                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
-                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
-                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-                "ext-mongo": "Allow sending log messages to a MongoDB server",
-                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
-                "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
-                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
-                "php-console/php-console": "Allow sending log messages to Google Chrome",
-                "rollbar/rollbar": "Allow sending log messages to Rollbar",
-                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-                "sentry/sentry": "Allow sending log messages to a Sentry server"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Monolog\\": "src/Monolog"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
-                    "homepage": "http://seld.be"
-                }
-            ],
-            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
-            "homepage": "http://github.com/Seldaek/monolog",
-            "keywords": [
-                "log",
-                "logging",
-                "psr-3"
-            ],
-            "support": {
-                "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/1.27.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/Seldaek",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/monolog/monolog",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-06-09T08:53:42+00:00"
-        },
-        {
-            "name": "psr/log",
-            "version": "1.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "https://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for logging libraries",
-            "homepage": "https://github.com/php-fig/log",
-            "keywords": [
-                "log",
-                "psr",
-                "psr-3"
-            ],
-            "support": {
-                "source": "https://github.com/php-fig/log/tree/1.1.4"
-            },
-            "time": "2021-05-03T11:20:27+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4|^8.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }

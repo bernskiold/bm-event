@@ -3,12 +3,12 @@
 namespace BernskioldMedia\WP\Event\Rest;
 
 use BernskioldMedia\WP\Event\Plugin;
-use BernskioldMedia\WP\PluginBase\Rest\RestEndpoint;
+use BernskioldMedia\WP\Event\Abstracts\REST_Endpoint;
 use WP_REST_Response;
 
 defined( 'ABSPATH' ) || exit;
 
-class SessionGrid extends RestEndpoint {
+class SessionGrid extends REST_Endpoint {
 
 	protected $namespace = 'bm-events';
 

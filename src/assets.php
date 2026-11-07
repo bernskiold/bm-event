@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @package BernskioldMedia\WP\Event
  */
-class Assets {
+class Assets implements Hookable {
 
 	/**
 	 * Assets Constructor

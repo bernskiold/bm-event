@@ -2,7 +2,6 @@
 
 namespace BernskioldMedia\WP\Event\Blocks\Track_Timetable;
 
-use BernskioldMedia\WP\Block_Plugin_Support\Block;
 use BernskioldMedia\WP\Event\Data_Stores;
 use BernskioldMedia\WP\Event\Plugin;
 
@@ -11,7 +10,7 @@ use BernskioldMedia\WP\Event\Plugin;
  *
  * @package BernskioldMedia\WP\Event\Blocks\Track_Timetable
  */
-class Track_Timetable_Block extends Block {
+class Track_Timetable_Block {
 
 	/**
 	 * Since this is a dynamically generated block, we
@@ -29,6 +28,15 @@ class Track_Timetable_Block extends Block {
 			'default' => false,
 		],
 	];
+
+	/**
+	 * Get the attributes to register the block with.
+	 *
+	 * @return array
+	 */
+	public static function get_attributes(): array {
+		return static::$attributes;
+	}
 
 	/**
 	 * Get Posts Query

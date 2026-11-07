@@ -12,6 +12,7 @@
  * @package BernskioldMedia\WP\Event
  */
 
+use BernskioldMedia\WP\Event\Install;
 use BernskioldMedia\WP\Event\Plugin;
 
 defined( 'ABSPATH' ) || exit;
@@ -19,14 +20,10 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Autoloader
  */
-require_once 'autoloader.php';
+require_once __DIR__ . '/autoloader.php';
 
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require __DIR__ . '/vendor/autoload.php';
-}
-
-if ( file_exists( WP_CONTENT_DIR . '/vendor/autoload.php' ) ) {
-	require_once WP_CONTENT_DIR . '/vendor/autoload.php';
 }
 /**
  * Basic Constants
@@ -34,11 +31,17 @@ if ( file_exists( WP_CONTENT_DIR . '/vendor/autoload.php' ) ) {
 define( 'BM_EVENT_FILE_PATH', __FILE__ );
 
 /**
+ * Grant the post type and taxonomy capabilities to the
+ * default roles and flush the rewrite rules on activation.
+ */
+register_activation_hook( __FILE__, [ Install::class, 'install' ] );
+
+/**
  * Initialize and boot the plugin.
  *
  * @return Plugin
  */
-function bm_event() {
+function bm_event(): Plugin {
 	return Plugin::instance();
 }
 
