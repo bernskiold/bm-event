@@ -2,20 +2,39 @@
   "name": "bernskioldmedia/bm-event",
   "description": "Functionality to help you market and manage an event. From showing speakers to a live agenda for one or multiple days.",
   "type": "wordpress-plugin",
-  "require": {
-    "composer/installers": "~1.0",
-    "php": ">=7.4|^8.0"
-  },
-  "license": "GPL-3.0+",
+  "homepage": "https://bernskiold.com",
+  "license": "GPL-3.0-or-later",
   "authors": [
     {
       "name": "Bernskiold Media",
       "email": "info@bernskioldmedia.com"
     }
   ],
+  "support": {
+    "source": "https://github.com/bernskiold/bm-event",
+    "issues": "https://github.com/bernskiold/bm-event/issues"
+  },
+  "require": {
+    "php": "^8.2",
+    "composer/installers": "^2.3"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "wp-coding-standards/wpcs": "^3.4"
+  },
+  "scripts": {
+    "lint": "phpcs",
+    "lint:fix": "phpcbf"
+  },
   "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
     "allow-plugins": {
-      "composer/installers": true
+      "composer/installers": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   }
 }

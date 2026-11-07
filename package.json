@@ -2,68 +2,54 @@
   "name": "bm-event",
   "version": "1.2.4",
   "description": "Functionality to help you market and manage an event. From showing speakers to a live agenda for one or multiple days.",
-  "main": "assets/scripts/src/index.js",
-  "scripts": {
-    "test": "phpunit",
-    "release": "npm install && composer install --no-dev -o && npm run build",
-    "setup": "composer install && npm install && npm run build",
-    "build": "npm run prod && npm run i18n",
-    "dev": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "npm run dev -- --watch",
-    "prod": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "lint": "npm run lint:styles && npm run lint:scripts && npm run lint:php",
-    "lint:styles": "cross-env stylelint './assets/styles/src/**/*.scss' --syntax scss",
-    "lint:scripts": "cross-env eslint './assets/scripts/src/**/*.js'",
-    "lint:php": "composer run lint",
-    "format": "npm run format-js",
-    "format:js": "eslint --fix assets/scripts/src",
-    "i18n": "npm run i18n:textdomain && npm run i18n:pot",
-    "i18n:textdomain": "npx wpi18n addtextdomain --exclude=vendor,node_modules --type theme",
-    "i18n:pot": "npx wpi18n makepot  --domain-path ./languages/"
+  "private": true,
+  "engines": {
+    "node": ">=26",
+    "npm": ">=11"
   },
+  "scripts": {
+    "setup": "npm install && composer install && npm run build",
+    "build": "wp-scripts build",
+    "dev": "wp-scripts start",
+    "i18n": "npm run i18n:pot",
+    "i18n:pot": "npm run build && wp i18n make-pot . ./languages/bm-event.pot --exclude=node_modules,vendor,tests",
+    "format": "wp-scripts format ./src ./assets/scripts/src",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:pkg-json",
+    "lint:js": "wp-scripts lint-js",
+    "lint:css": "wp-scripts lint-style './assets/styles/src/**/*.scss'",
+    "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "check-engines": "wp-scripts check-engines",
+    "packages-update": "wp-scripts packages-update"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bernskiold/bm-event.git"
+  },
+  "keywords": [
+    "wordpress",
+    "events",
+    "blocks"
+  ],
   "author": {
-    "name": "Bernskiold Media",
-    "email": "info@bernskioldmedia.com",
-    "url": "https://bernskioldmedia.com",
+    "name": "Bernskiold",
+    "email": "info@bernskiold.com",
+    "url": "https://bernskiold.com",
     "role": "developer"
   },
-  "devDependencies": {
-    "@babel/preset-react": "^7.29.7",
-    "@wordpress/eslint-plugin": "^4.1",
-    "babel-preset-react": "^6.24",
-    "browser-sync": "^3.0.4",
-    "browser-sync-webpack-plugin": "^2.4.0",
-    "cross-env": "^6.0",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-loader": "^3.0",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^22.1",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^3.4.1",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^2.5",
-    "laravel-mix": "^5.0.9",
-    "node-wp-i18n": "^1.2.8",
-    "postcss-custom-properties": "^9.2.0",
-    "postcss-preset-env": "^6.7",
-    "prettier": "^2.8.8",
-    "sass": "^1.102.0",
-    "sass-loader": "^8.0",
-    "stylelint": "^9.10",
-    "stylelint-config-wordpress": "^14.0",
-    "stylelint-declaration-use-variable": "^1.7",
-    "stylelint-order": "^2.2",
-    "stylelint-webpack-plugin": "^1.1",
-    "vue-template-compiler": "^2.7.16"
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/bernskiold/bm-event/issues"
   },
+  "homepage": "https://github.com/bernskiold/bm-event#readme",
   "dependencies": {
     "classnames": "^2.5.1",
-    "js-cookie": "^2.2.1",
-    "moment": "^2.31.0",
-    "moment-timezone": "^0.6.3",
-    "select2": "^4.1.0"
+    "js-cookie": "^3.0.8",
+    "moment-timezone": "^0.6.6"
+  },
+  "devDependencies": {
+    "@wordpress/dependency-extraction-webpack-plugin": "^7.1.0",
+    "@wordpress/scripts": "^37.1.0",
+    "globals": "^17.14.0",
+    "webpackbar": "^7.0.0"
   }
 }
